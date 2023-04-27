@@ -1,0 +1,22 @@
+----------------------------------------------------
+| Estimator      | Action         | Error rate     |
+----------------------------------------------------
+| Count          | CASH_IN        | 0.16           |
+| Count          | CASH_OUT       | 0.20           |
+| Count          | DEBIT          | 0.11           |
+| Count          | PAYMENT        | 0.22           |
+| Count          | TRANSFER       | 0.21           |
+----------------------------------------------------
+| Average amount | CASH_IN        | 0.07           |
+| Average amount | CASH_OUT       | 6.67           |
+| Average amount | DEBIT          | 0.02           |
+| Average amount | PAYMENT        | 0.06           |
+| Average amount | TRANSFER       | 0.53           |
+----------------------------------------------------
+| Std amount     | CASH_IN        | 0.26           |
+| Std amount     | CASH_OUT       | 4.84           |
+| Std amount     | DEBIT          | 0.07           |
+| Std amount     | PAYMENT        | 0.16           |
+| Std amount     | TRANSFER       | 0.18           |
+----------------------------------------------------
+
