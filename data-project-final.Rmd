@@ -1,0 +1,205 @@
+---
+title: "Data Exploration And Visualization"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(caret)
+library(dplyr)
+library(MLmetrics)
+library(naivebayes)
+library(randomForest)
+library(reshape)
+library(kernlab)
+# devtools::install_version('DMwR', '0.4.1')
+library("DMwR")
+set.seed(12)
+```
+
+## Read the data
+
+```{r}
+data <- read.csv('./data/PS_20230404203710_1288618611/PS_20230404203710_1288618611_log.csv', nrows=10000)
+```
+
+## Exploratory analysis
+
+#### Graph of what action are tagged as isFraud
+
+```{r}
+ggplot(data, aes(x=type, y=isFraud, fill=type)) + 
+  geom_bar(stat = "identity")
+```
+#### Histogram of amounts tagged as frauds
+
+```{r}
+ggplot(data[data$isFraud==1,], aes(x=amount)) + 
+  geom_histogram(bins = 20)
+```
+#### Top recepients accounts tagged as fraud based on amount
+
+```{r}
+fraud_data <- data[data$isFraud==1,]
+ordered_data <- fraud_data[order(fraud_data$amount),]
+
+ggplot(tail(ordered_data, 10), aes(x=nameDest, y=amount, fill=nameDest)) + 
+  coord_flip() +
+  geom_bar(stat = "identity", ) 
+```
+
+## Preprocessing
+
+### Convert the output as factor
+
+```{r}
+data$isFraud <- as.factor(data$isFraud)
+data$type <- as.factor(data$type)
+```
+
+### Select required columns based on variances
+
+```{r}
+# Removing vars with 0 variance
+sdata <- select(data, type, amount, oldbalanceOrg, newbalanceOrig, oldbalanceDest, newbalanceDest, isFraud)
+``` 
+
+### Check and fix class imbalance so that we can apply our algorithms
+
+```{r}
+table(sdata$isFraud)
+
+# Class is highly imbalanced, we can fix it
+sdata <- SMOTE(isFraud ~ ., sdata, perc.over = 2000, perc.under = 400)
+
+# Verify if the balance is okay
+table(sdata$isFraud)
+```
+
+### Split the data into training and test
+
+```{r}
+split_index <- createDataPartition(y = sdata$isFraud, times = 1, p = 0.6, list = FALSE)
+training_data <- sdata[split_index,]
+test_data <- sdata[-split_index,]
+dim(training_data)
+dim(test_data)
+```
+
+### Create control for Cross validation
+
+```{r}
+control <- trainControl(method = "repeatedcv", number = 2, repeats = 2)
+```
+
+## Training & Evaluation of Models
+
+### K nearest neighbours
+
+#### Training 
+
+```{r}
+knn.model <- train(isFraud ~ ., 
+                   method='knn', 
+                   data = training_data, 
+                   preProcess = c("center", "scale"), 
+                   trControl=control)
+
+plot(knn.model)
+```
+
+#### Validation
+
+```{r}
+predictions <- predict(knn.model, test_data)
+confusionMatrix(predictions, test_data$isFraud )
+F1_Score(test_data$isFraud, predictions)
+```
+### Random Forest
+
+#### Training 
+
+```{r}
+rf.model <- train(isFraud ~ ., 
+                   method='rf', 
+                   data = training_data, 
+                   preProcess = c("center", "scale"), 
+                   trControl=control)
+
+plot(rf.model)
+```
+
+#### Validation
+
+```{r}
+predictions <- predict(rf.model, test_data)
+confusionMatrix(predictions, test_data$isFraud )
+F1_Score(test_data$isFraud, predictions)
+```
+
+
+### Naive Bayes
+
+#### Training 
+
+```{r}
+nb.model <- train(isFraud ~ ., 
+                   method='naive_bayes', 
+                   data = training_data, 
+                   preProcess = c("center", "scale"), 
+                   trControl=control)
+
+plot(nb.model)
+```
+
+#### Validation
+
+```{r}
+predictions <- predict(nb.model, test_data)
+confusionMatrix(predictions, test_data$isFraud )
+F1_Score(test_data$isFraud, predictions)
+```
+
+
+### Support vector machines
+
+#### Training 
+
+```{r}
+svm.model <- train(isFraud ~ ., 
+                   method='svmLinear', 
+                   data = training_data, 
+                   preProcess = c("center", "scale"), 
+                   trControl=control)
+
+```
+
+#### Validation
+
+```{r}
+predictions <- predict(svm.model, test_data)
+confusionMatrix(predictions, test_data$isFraud )
+F1_Score(test_data$isFraud, predictions)
+```
+
+### Neural Networks
+
+#### Training 
+
+```{r}
+nn.model <- train(isFraud ~ ., 
+                   method='nnet', 
+                   data = training_data, 
+                   preProcess = c("center", "scale"), 
+                   trControl=control)
+
+plot(nn.model)
+```
+
+#### Validation
+
+```{r}
+predictions <- predict(nn.model, test_data)
+confusionMatrix(predictions, test_data$isFraud )
+F1_Score(test_data$isFraud, predictions)
+```

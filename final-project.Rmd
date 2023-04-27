@@ -1,0 +1,58 @@
+---
+title: "Final Report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Most of the monetary transactions these days happen on he internet. Although it makes our lives easy, they also result in fraud and cheating. This project aims at detecting fraudulent transactions using machine learning. The domain for this project is Finance. As we have a lot of machine learning algorithms, our approach would be to build server models, tune them and evaluate their performance. This way we can identify which is the best performing method for this problem. 
+
+## Related work
+
+One research paper was already present which uses Auto encoders for detection of fraud. They got an accuracy of 83% for data.
+
+Reference:
+L. S. Chandradeva, I. Jayasooriya and A. C. Aponso, "Fraud Detection Solution for Monetary Transactions with Autoencoders," 2019 National Information Technology Conference (NITC), Colombo, Sri Lanka, 2019, pp. 31-34, doi: 10.1109/NITC48475.2019.9114519.
+
+
+One research paper used Adopting Nonlinear Activated Beetle Antennae Search Algorithm for Fraud Detection in American publicly traded companies.
+
+Reference:
+Bolin Liao, Zhendai Huang, Xinwei Cao, Jianfeng Li, "Adopting Nonlinear Activated Beetle Antennae Search Algorithm for Fraud Detection of Public Trading Companies: A Computational Finance Approach", Mathematics, vol.10, no.13, pp.2160, 2022.
+
+## Methods
+
+We used a simulator called as PaySim to generate a synthetic data that will be used for model training and validation. The data generated with this is clean and had no missing data. But it was extremely unbalanced. So we had to use SMOTE method to generate synthetic samples for the minority class. We also filtered out columns based on the variance. With this data, we built a few machine learning models using algorithms such as Naive Bayes, K-Nearest Neighbors, Random Forest, Support Vector Machines, Neural networks along with some hyper parameter tuning to optimize the output/accuracy. For evaulation of the above models, we performed cross validation and used confusion matrix, precision, recall and F-score to evacuate the models. 
+
+## Results and discussion
+
+Out of all the models that were built, Random forest performed the best with an F1 score  of over 99.7%. It was closely followed by Neural Networks with 99.10%. The worst performing model was Naive Bayes with an accuracy of 94.47%.
+
+```{r echo=FALSE}
+library(ggplot2)
+accuracies <- c(0.9887279, 0.9970094, 0.9447765, 0.9494126, 0.9910324)
+algorithms <- c('K Nearest Neighbours', 'Random Forest', 'Naive Bayes', 'Support Vector Machines', 'Neural Networks')
+df <- data.frame(accuracies, algorithms)
+ggplot(df, aes(x=accuracies, y=algorithms, fill=algorithms)) + 
+  geom_bar(stat = "identity", ) 
+```
+
+
+## Conclusion
+
+Based on the results presented above, we can conclude that Random Forest model performed the best. It was also one of the fastest to train and classify. So for this particular problem of fraud detection, Random forest algorithm is ideal. We had used a tool to generate synthetic data and applied SMOTE method to balance the dataset. This might not be the most ideal approach. Going forward, we should try and use more accurate representation of digital transactions.
+
+## Data and Software Availability
+
+The simulated data can be found in https://github.com/Akhilsunny25/CIS635.
+
+## References
+
+L. S. Chandradeva, I. Jayasooriya and A. C. Aponso, "Fraud Detection Solution for Monetary Transactions with Autoencoders," 2019 National Information Technology Conference (NITC), Colombo, Sri Lanka, 2019, pp. 31-34, doi: 10.1109/NITC48475.2019.9114519.
+
+Bolin Liao, Zhendai Huang, Xinwei Cao, Jianfeng Li, "Adopting Nonlinear Activated Beetle Antennae Search Algorithm for Fraud Detection of Public Trading Companies: A Computational Finance Approach", Mathematics, vol.10, no.13, pp.2160, 2022.
+
